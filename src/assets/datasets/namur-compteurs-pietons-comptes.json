@@ -1,0 +1,29 @@
+{
+  "id": "namur-compteurs-pietons-comptes",
+  "name": "Namur - Compteurs piétons - Comptes",
+  "description": "Les compteurs sont la propriété de l’asbl Gau Namur qui en a fait acquisition en 2012. Le traitement des données est pris en charge par la Ville de Namur. Actuellement, les données sont accessibles par GAU et la Ville (SAE-Mobilité).\n\nLes compteurs sont placés à 5 endroits du centre-ville, dans l’axe commercial fort et ils sont actifs en permanence. Ils permettent de mesurer la fréquentation piétonne du centre-ville en comptabilisant le flux des piétons par tranche horaire.\n\nLes différentes colonnes correspondant à des installations différentes ou à des remplacement pour cause de panne.\n\nLes données issues de compteurs sont brutes. Les chiffres doivent toutefois être relativisés, ils reflètent une tendance plutôt qu’une donnée absolue en raison notamment des impondérables liés à l’activité d’un centre-ville (vandalisme, présence d’un vélo ou d’une poubelle d’un commerçant devant la cellule).\n\nLes données ne sont pas mises à jour automatiquement ! Sur demande, nous pouvons ajouter les données des derniers jours.",
+  "downloads": 63,
+  "pubCycle": 10,
+  "perdiodicity": 0,
+  "themes": [
+    { "id": 0, "label": "Transports" },
+    { "id": 1, "label": "Déplacements" }
+  ],
+  "keywords": ["Compteur", "Piéton", "EcoCompteur", "mobilité", "Historique"],
+  "licence": {
+    "name": "CC BY",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "language": "fr",
+  "modifiedAt": "2018-12-06T08:37:00.000Z",
+  "producer": {
+    "id": 0,
+    "name": "Eco-Compteur",
+    "url": "https://www.eco-compteur.com/fr/"
+  },
+  "territory": "Namur",
+  "updatedAt": {
+    "metadata": "2021-09-24T07:36:00.000Z",
+    "data": "2018-12-06T10:03:00.000Z"
+  }
+}

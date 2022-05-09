@@ -1,1 +1,174 @@
-/* You can add global styles to this file, and also import other style files */
+@import "~primeicons/primeicons.css";
+@import "~primeng-lts/resources/themes/saga-blue/theme.css";
+@import "~primeng-lts/resources/primeng.min.css";
+@import "~primeflex/primeflex";
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* Vars */
+
+$typo-grid-base: 1.2rem;
+$color-primary: #0e2240;
+$color-secondary: #e6eeff;
+$color-text: #212121;
+$color-text-contrast: #ebebeb;
+$color-grey: #eee;
+$color-alert: #b00020;
+
+/* Base setup */
+
+html {
+  font-size: 62.5%;
+  font-size: calc(1em * 0.625); /* fix */
+  line-height: 0; // Fix normalize for rythm respect
+}
+body {
+  font-family: "Segoe UI Semibold", "Open Sans", sans-serif;
+  font-size: 1.6rem;
+  background-color: $color-text-contrast;
+  color: $color-text;
+}
+
+/* Based on
+ * https://matejlatin.github.io/Gutenberg/
+ * https://betterwebtype.com/articles/2018/10/15/rhythm-in-web-typography/
+ */
+body {
+  > * {
+    //line-height: $typo-grid-base; // Side effect - must specified on case
+    margin-top: 0;
+    margin-bottom: $typo-grid-base;
+  }
+  ul {
+    margin-bottom: #{2 * $typo-grid-base};
+  }
+  ul,
+  ol {
+    padding-left: 0;
+    list-style-position: outside;
+  }
+  blockquote p {
+    hanging-punctuation: first;
+  }
+}
+
+// heanding: font-weight, font-size, letter-spacing, line-height, margin-top, margin-bottom
+$headings: (
+  h1: (900, 3rem, 0, 3, 2, 2),
+  h2: (900, 2.4rem, 0, 2, 0, 0),
+  // h3: (900, 2.8rem, -0.56px, 1.5, 1.5, 1),
+  // h4: (900, 2.4rem, -0.48px, 1, 1, 1),
+  p: (400, 1.8rem, 0, 2, 1, 1)
+);
+
+@each $heading, $properties in $headings {
+  #{$heading} {
+    font-weight: nth($properties, 1);
+    font-size: nth($properties, 2);
+    letter-spacing: nth($properties, 3);
+    line-height: #{nth($properties, 4) * $typo-grid-base};
+    margin-top: #{nth($properties, 5) * $typo-grid-base};
+    margin-bottom: #{nth($properties, 6) * $typo-grid-base};
+  }
+}
+
+// h1 + h2 { margin-top: $typo-grid-base }
+// h2 + h3 { margin-top: -#{.5 * $typo-grid-base} }
+
+/* Extends */
+
+p-dropdown.full-width .p-dropdown {
+  width: 100%;
+}
+
+/* Body */
+header {
+  ul {
+    background-color: $color-primary;
+    color: $color-text-contrast;
+    display: flex;
+    margin: 0;
+
+    a {
+      display: inline-block;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: $color-text-contrast;
+      line-height: $typo-grid-base * 2;
+      text-decoration: none;
+      padding: $typo-grid-base * 2;
+
+      &:hover, &:focus {
+        background-color: rgba(white, .05);
+        outline: 0;
+      }
+    }
+  }
+}
+
+main {
+  height: calc(100vh - #{$typo-grid-base * 12});
+  padding: $typo-grid-base;
+  // ! router-outlet
+  *:first-child {
+    margin-top: 0;
+  }
+  *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+footer {
+  text-align: center;
+  color: rgba(#000, .6);
+  margin: $typo-grid-base * 2;
+  p {
+    margin: 0;
+  }
+}

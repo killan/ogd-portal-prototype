@@ -1,0 +1,7 @@
+<h1>Données</h1>
+<p>Liste des datasets.</p>
+<ul>
+  <li *ngFor="let d of datasets">
+    <a [routerLink]="['/datasets/' + d.id ]">{{ d.name || d.id }}</a>
+  </li>
+</ul>

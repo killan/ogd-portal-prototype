@@ -1,0 +1,12 @@
+{
+  "axis1": [
+    "pie"
+  ],
+  "axis2": [
+    "bar",
+    "line"
+  ],
+  "other": [
+    "map"
+  ]
+}

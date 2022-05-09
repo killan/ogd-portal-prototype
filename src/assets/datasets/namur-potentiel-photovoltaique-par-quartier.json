@@ -1,0 +1,28 @@
+{
+  "id": "namur-potentiel-photovoltaique-par-quartier",
+  "name": "Namur - Potentiel photovoltaïque par quartier",
+  "description": "Calcul du potentiel photovoltaïque par quartier sur base de la géométrie des toitures (modélisation de Namur en 3D).\n\nLes attributs pour chaque quartier sont :\n\nla production potentielle moyenne d’électricité en KWh/m².an ;\n\nl’année de construction moyenne ;\nla proportion de propriétaires (%) ;\nle revenu moyen (€).",
+  "downloads": 18,
+  "pubCycle": 10,
+  "perdiodicity": 0,
+  "themes": [
+    { "id": 2, "label": "Energie" }
+  ],
+  "keywords": ["Energie", "Photovoltaïque", "Quartier", "Pavillon", "Namur3D", "Solaire"],
+  "licence": {
+    "name": "CC BY",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "language": "fr",
+  "modifiedAt": "2018-06-04T19:16:00.000Z",
+  "producer": {
+    "id": 1,
+    "name": "Ville de Namur",
+    "url": "https://www.pavillon-namur.be/3d"
+  },
+  "territory": "Namur",
+  "updatedAt": {
+    "metadata": "2021-12-06T09:33:00.000Z",
+    "data": "2020-11-05T14:34:00.000Z"
+  }
+}
