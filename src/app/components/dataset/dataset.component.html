@@ -10,8 +10,8 @@
 
     <div class="analyse p-4">
       <div class="grid">
-        <div class="col"> <!-- for compatibility -->
-          <p-chart type="bar" [data]="computedData" [options]="computedOptions" height="50vh"></p-chart>
+        <div class="col {{ layer }}" *ngFor="let layer of layers">
+          <p-chart [type]="layer.type" [data]="layer" [options]="computedOptions[layer.type]" height="50vh"></p-chart>
           <!-- force height / calculus ? -->
         </div>
       </div>

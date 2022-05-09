@@ -1,6 +1,6 @@
 export enum GraphType {
-  Bar,
-  Line,
-  Map,
-  Pie
+  Bar = 'bar',
+  Line = 'line',
+  Map = 'map',
+  Pie = 'pie'
 }

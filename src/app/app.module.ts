@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -14,6 +14,7 @@ import { DatasetsComponent } from './components/datasets/datasets.component';
 import { TabViewModule } from 'primeng-lts/tabview';
 import { ChartModule } from 'primeng-lts/chart';
 
+import { LoaderService } from './services/loader.service';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,15 @@ import { ChartModule } from 'primeng-lts/chart';
     TabViewModule,
     ChartModule
   ],
-  providers: [],
+  providers: [
+    LoaderService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (ls: LoaderService) => () => ls.load(),
+      deps: [LoaderService],
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

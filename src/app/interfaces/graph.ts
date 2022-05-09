@@ -8,7 +8,7 @@ export interface GraphStruct {
 
 export interface SerieStruct {
   label: string
-  groupByAttribute: string
+  groupByAttribute?: string
   valueAttribute: string
   data: DataStruct[]
   graphType: GraphType
