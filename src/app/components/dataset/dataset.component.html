@@ -10,8 +10,8 @@
 
     <div class="analyse p-4">
       <div class="grid">
-        <div class="col {{ layer }}" *ngFor="let layer of layers">
-          <p-chart [type]="layer.type" [data]="layer" [options]="computedOptions[layer.type]" height="50vh"></p-chart>
+        <div class="col-{{ 12 / layers.length }} {{ layer.type }}" *ngFor="let layer of layers">
+          <p-chart [type]="layer.type" [data]="layer" [options]="computedOptions[layer.type]" height="50vh" width="100%" style="width: calc((100vw - 400px - (1.2rem * 2)) / {{ layers.length }})"></p-chart>
           <!-- force height / calculus ? -->
         </div>
       </div>
