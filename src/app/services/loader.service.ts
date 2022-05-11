@@ -6,20 +6,17 @@ import { GraphService } from "./graph.service";
   providedIn: 'root'
 })
 export class LoaderService {
-
-  data: any = {}
-
   constructor(
     private graphService: GraphService
   ) { }
 
   load(): Promise<any> {
     return forkJoin({
-      graphCompatibilityTypes: this.graphService.getCompatibilityTypes()
+      graphCompatibilityTypes: this.graphService.getCompatibilityTypesData()
     })
     .toPromise()
     .then(data => {
-      this.data.graphCompatibilityTypes = data.graphCompatibilityTypes
+      this.graphService.setCompatibilityTypes(data.graphCompatibilityTypes)
     })
   }
 }
