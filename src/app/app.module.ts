@@ -16,6 +16,7 @@ import { DatasetsComponent } from './components/datasets/datasets.component';
 import { TabViewModule } from 'primeng-lts/tabview';
 import { ChartModule } from 'primeng-lts/chart';
 import { DropdownModule } from 'primeng-lts/dropdown';
+import { ButtonModule } from 'primeng-lts/button';
 
 import { LoaderService } from './services/loader.service';
 
@@ -38,7 +39,8 @@ import { LoaderService } from './services/loader.service';
 
     TabViewModule,
     ChartModule,
-    DropdownModule
+    DropdownModule,
+    ButtonModule
   ],
   providers: [
     LoaderService,

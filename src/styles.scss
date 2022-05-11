@@ -139,6 +139,29 @@ p-dropdown.full-width .p-dropdown {
   width: 100%;
 }
 
+.p-button {
+  border-radius: 0;
+  padding: .8rem;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+}
+
+.p-button.p-button-secondary,
+.p-buttonset.p-button-secondary > .p-button,
+.p-splitbutton.p-button-secondary > .p-button {
+  background: $color-secondary;
+  border-color: $color-secondary;
+  color: $color-text;
+}
+.p-button.p-button-secondary:enabled:hover,
+.p-buttonset.p-button-secondary > .p-button:enabled:hover,
+.p-splitbutton.p-button-secondary > .p-button:enabled:hover {
+  background: $color-secondary;
+  border-color: $color-secondary;
+  color: $color-text;
+  border-color: rgba($color-primary, .3);
+}
+
 /* Body */
 header {
   ul {

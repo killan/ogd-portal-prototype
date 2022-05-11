@@ -26,6 +26,7 @@ export class DatasetComponent implements OnInit {
   operations: any[] = []
   graphTypes: any[] = []
 
+  serieCounter: number = 1
   curTab: string = 'data'
 
   // datasets[series[]|filtering]
@@ -107,7 +108,7 @@ export class DatasetComponent implements OnInit {
         ngs.fields = Object.keys(ngs.dataset.data[0].fields).map(m => ({ id: m, label: this.translatorService.t(m) }))
         // Add default serie(s)
         ngs.series.push({
-          label: 'Série #1', // TODO #?
+          label: 'Série #' + this.serieCounter++,
           graphCompatibility: this.graphService.getCompatibilityFromType(GraphType.Bar),
           graphType: GraphType.Bar,
           groupByAttribute: fieldsString[0],
@@ -116,7 +117,7 @@ export class DatasetComponent implements OnInit {
           backgroundColor: this.colors[0],
           data: []
         }, {
-          label: 'Série #2',
+          label: 'Série #' + this.serieCounter++,
           graphType: GraphType.Pie,
           graphCompatibility: this.graphService.getCompatibilityFromType(GraphType.Pie),
           valueAttribute: fieldsNumber[fieldsNumber.length - 1],
@@ -133,15 +134,46 @@ export class DatasetComponent implements OnInit {
     })
   }
 
+  private getRandomInt(max: number): number {
+    return Math.floor(Math.random() * max)
+  }
+
   tabChange(tabName: string): void {
     this.curTab = tabName
   }
 
-  serieOptionChange(event: any, serie: any, attr: string): void {
+  serieOptionChange(event: any, gs: GraphStruct, serie: any, attr: string): void {
     // Update the attribute value
     serie[attr] = event.value
     // Update in case of
-    serie.graphCompatibility = this.graphService.getCompatibilityFromType(serie.graphType),
+    serie.graphCompatibility = this.graphService.getCompatibilityFromType(serie.graphType)
+    // Specific update
+    if (attr == 'graphType' && !serie.groupByAttribute) {
+      serie.groupByAttribute = gs.fields![0].id
+    }
+    // Do it again
+    this.computeData()
+  }
+
+  removeSerie(event: any, gs: GraphStruct, serie: any, index: number): void {
+    // Remove
+    gs.series.splice(index, 1)
+    // Do it again
+    this.computeData()
+  }
+
+  addSerie(event: any, gs: GraphStruct): void {
+    // Add a default one
+    gs.series.push({
+      label: 'Série #' + this.serieCounter++,
+      graphCompatibility: this.graphService.getCompatibilityFromType(GraphType.Bar),
+      graphType: GraphType.Bar,
+      groupByAttribute: gs.fields![this.getRandomInt(gs.fields!.length)].id,
+      valueAttribute: gs.fields![this.getRandomInt(gs.fields!.length)].id,
+      operation: Operation.Sum,
+      backgroundColor: this.colors[this.getRandomInt(this.colors.length)],
+      data: []
+    })
     // Do it again
     this.computeData()
   }
@@ -173,6 +205,7 @@ export class DatasetComponent implements OnInit {
         sortByProperty(s.data, 'value', true)
 
         const layer = this.layers.find(f => f.type === type)
+        // TODO check labels to differ graph
         if (!layer) {
           this.layers.push({
             type,
