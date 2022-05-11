@@ -1,6 +1,8 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +15,7 @@ import { DatasetsComponent } from './components/datasets/datasets.component';
 
 import { TabViewModule } from 'primeng-lts/tabview';
 import { ChartModule } from 'primeng-lts/chart';
+import { DropdownModule } from 'primeng-lts/dropdown';
 
 import { LoaderService } from './services/loader.service';
 
@@ -28,11 +31,14 @@ import { LoaderService } from './services/loader.service';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
 
     TabViewModule,
-    ChartModule
+    ChartModule,
+    DropdownModule
   ],
   providers: [
     LoaderService,
