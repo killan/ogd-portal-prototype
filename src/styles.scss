@@ -2,6 +2,7 @@
 @import "~primeng-lts/resources/themes/saga-blue/theme.css";
 @import "~primeng-lts/resources/primeng.min.css";
 @import "~primeflex/primeflex";
+@import '~@fortawesome/fontawesome-free/css/all.css';
 
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
@@ -124,6 +125,10 @@ $headings: (
 
 /* Extends */
 
+.text-alert {
+  color: $color-alert
+}
+
 p-dropdown.full-width .p-dropdown {
   width: 100%;
 }
@@ -171,4 +176,75 @@ footer {
   p {
     margin: 0;
   }
+}
+
+/* Bloc */
+.bloc {
+  .bloc-title {
+    background-color: $color-primary;
+    color: $color-text-contrast;
+    padding: .8rem 1rem;
+    display: flex;
+    align-items: center;
+
+    > span {
+      flex-grow: 1;
+    }
+
+    i {
+      font-size: 1.6rem;
+      & + i {
+        margin-left: 1.2rem;
+      }
+    }
+  }
+
+  &:not(.multi) {
+    background-color: $color-secondary;
+    padding: 1.2rem;
+
+    > .bloc-title {
+      margin: -1.2rem;
+      margin-bottom: 1.2rem;
+    }
+  }
+
+  .bloc-item {
+    margin: 1.2rem 0;
+    background-color: $color-secondary;
+    padding: 1.2rem;
+    position: relative;
+
+    .bloc-title {
+      margin: -1.2rem;
+      margin-bottom: 1.2rem;
+      font-size: 1.6rem;
+      padding: .6rem .8rem;
+
+      .color {
+        width: 1.2rem;
+        flex-grow: 0;
+        height: 1.2rem;
+        margin-right: .8rem;
+      }
+    }
+
+    > .closer {
+      background-color: $color-text-contrast;
+      padding: 1px;
+      position: absolute;
+      top: -.8rem;
+      right: -.8rem;
+      border-radius: 50%;
+    }
+  }
+}
+
+label {
+  font-size: 1.4rem;
+  line-height: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.p-field:not(:last-child) {
+  margin-bottom: .6rem;
 }
