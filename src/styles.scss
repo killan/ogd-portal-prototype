@@ -59,7 +59,7 @@ $typo-grid-base: 1.2rem;
 $color-primary: #0e2240;
 $color-secondary: #e6eeff;
 $color-text: #212121;
-$color-text-contrast: #ebebeb;
+$color-text-contrast: white; // #ebebeb
 $color-grey: #eee;
 $color-alert: #b00020;
 
@@ -123,12 +123,18 @@ $headings: (
 // h1 + h2 { margin-top: $typo-grid-base }
 // h2 + h3 { margin-top: -#{.5 * $typo-grid-base} }
 
-/* Extends */
-
+/* Colors */
 .text-alert {
   color: $color-alert
 }
+.bg-secondary {
+  background-color: $color-secondary;
+}
+.bg-contrast {
+  background-color: $color-text-contrast;
+}
 
+/* Extends */
 p-dropdown.full-width .p-dropdown {
   width: 100%;
 }

@@ -26,6 +26,8 @@ export class DatasetComponent implements OnInit {
   operations: any[] = []
   graphTypes: any[] = []
 
+  curTab: string = 'data'
+
   // datasets[series[]|filtering]
 
   computedOptions: any = {
@@ -132,7 +134,7 @@ export class DatasetComponent implements OnInit {
   }
 
   tabChange(tabName: string): void {
-    console.log('tabChange: ' + tabName)
+    this.curTab = tabName
   }
 
   serieOptionChange(event: any, serie: any, attr: string): void {
