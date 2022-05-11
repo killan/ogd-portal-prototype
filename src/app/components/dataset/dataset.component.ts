@@ -116,7 +116,7 @@ export class DatasetComponent implements OnInit {
           operation: Operation.Sum,
           backgroundColor: this.colors[0],
           data: []
-        }, {
+        }/*, {
           label: 'Série #' + this.serieCounter++,
           graphType: GraphType.Pie,
           graphCompatibility: this.graphService.getCompatibilityFromType(GraphType.Pie),
@@ -124,7 +124,7 @@ export class DatasetComponent implements OnInit {
           operation: Operation.Count,
           backgroundColor: this.colors,
           data: []
-        })
+        }*/)
         // Add dataset to graph structure
         this.gs.push(ngs)
 
@@ -151,6 +151,7 @@ export class DatasetComponent implements OnInit {
     if (attr == 'graphType' && !serie.groupByAttribute) {
       serie.groupByAttribute = gs.fields![0].id
     }
+    // TODO on change graph type : change color mode if possible
     // Do it again
     this.computeData()
   }
@@ -163,6 +164,7 @@ export class DatasetComponent implements OnInit {
   }
 
   addSerie(event: any, gs: GraphStruct): void {
+    // TODO get default info from dataset presets
     // Add a default one
     gs.series.push({
       label: 'Série #' + this.serieCounter++,
