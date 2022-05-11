@@ -5,7 +5,7 @@
 
   <div class="col">
     <ul class="tabs list-none m-0">
-      <li (click)="tabChange('analyse')" class="p-4">Analyse</li>
+      <li (click)="tabChange('analyse')" class="p-4"><i class="fa-solid fa-chart-column"></i> Analyse</li>
     </ul>
 
     <div class="analyse p-4">
@@ -18,5 +18,55 @@
     </div>
   </div>
 
-  <div class="col-fixed" style="width:200px">Fixed</div>
+  <div class="col-fixed" style="width:200px">
+    <ng-container *ngIf="gs && gs.length">
+      <section class="bloc multi">
+        <h2 class="bloc-title">
+          <span>Séries</span>
+          <i class="fa-solid fa-circle-info"></i>
+          <i class="fa-solid fa-chevron-up"></i>
+        </h2>
+        <div class="bloc-item" *ngFor="let serie of gs[0].series; let i = index">
+          <div class="closer text-alert"><i class="fa-solid fa-circle-xmark"></i></div>
+          <h3 class="bloc-title">
+            <!-- Create component for color rendering for mono|multiple color(s) -->
+            <span class="color" style="background-color: {{ serie.backgroundColor }}"></span>
+            <span>{{ serie.label }}</span>
+          </h3>
+          <div class="options"> <!-- Adapted to the graph type -->
+            <div class="p-field">
+              <label [for]="'attr_' + i">Attribut</label>
+              <p-dropdown [options]="gs[0].fields!" [ngModel]="serie.valueAttribute" optionValue="id" optionLabel="label"
+                styleClass="w-12" [inputId]="'attr_' + i" (onChange)="serieOptionChange($event, serie, 'valueAttribute')"></p-dropdown>
+            </div>
+            <div class="p-field" *ngIf="serie.graphCompatibility == 'bar'">
+              <label for="xaxis">Attribut de l'axe X</label>
+              <p-dropdown [options]="gs[0].fields!" [ngModel]="serie.groupByAttribute" optionValue="id" optionLabel="label"
+                styleClass="w-12" inputId="xaxis" (onChange)="serieOptionChange($event, serie, 'groupByAttribute')"></p-dropdown>
+            </div>
+            <div class="p-field">
+              <label [for]="'op_' + i">Operation</label>
+              <p-dropdown [options]="operations" [ngModel]="serie.operation" optionValue="id" optionLabel="label"
+                styleClass="w-12" [inputId]="'op_' + i" (onChange)="serieOptionChange($event, serie, 'operation')"></p-dropdown>
+            </div>
+            <div class="p-field">
+              <label [for]="'type_' + i">Type</label>
+              <p-dropdown [options]="graphTypes" [ngModel]="serie.graphType" optionValue="id" optionLabel="label"
+                styleClass="w-12" [inputId]="'type_' + i" (onChange)="serieOptionChange($event, serie, 'graphType')"></p-dropdown>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bloc">
+        <h2 class="bloc-title">
+          <span>Options</span>
+          <i class="fa-solid fa-chevron-up"></i>
+        </h2>
+        <div class="options">
+
+        </div>
+      </section>
+    </ng-container>
+  </div>
 </div>

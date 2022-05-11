@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { GraphType } from 'src/app/enums/graph';
+import { Operation } from 'src/app/enums/operation';
 
-import { Data } from 'src/app/interfaces/dataset';
-import { DataStruct, GraphStruct, SerieStruct } from 'src/app/interfaces/graph';
+import { GraphStruct } from 'src/app/interfaces/graph';
 
 import { DatasetService } from 'src/app/services/dataset.service';
 import { GraphService } from 'src/app/services/graph.service';
-import { LoaderService } from 'src/app/services/loader.service';
 import { sortByProperty } from 'src/app/services/sort';
+import { TranslatorService } from 'src/app/services/translator.service';
 
 @Component({
   selector: 'app-dataset',
@@ -23,7 +23,8 @@ export class DatasetComponent implements OnInit {
 
   layers: any[] = []
 
-  compatibilityTypes: { [key: string]: string[] }
+  operations: any[] = []
+  graphTypes: any[] = []
 
   // datasets[series[]|filtering]
 
@@ -70,40 +71,58 @@ export class DatasetComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private datasetService: DatasetService,
     private graphService: GraphService,
-    private loaderService: LoaderService
+    private translatorService: TranslatorService
   ) {
-    this.compatibilityTypes = this.loaderService.data.graphCompatibilityTypes
+    this.operations = [
+      { id: 'sum', label: this.translatorService.t('sum') },
+      { id: 'cnt', label: this.translatorService.t('cnt') }
+    ]
+
+    let i = 1;
+    const compatTypes = this.graphService.getCompatibilityTypes()
+    Object.keys(compatTypes).forEach(k => {
+      compatTypes[k].forEach(t => {
+        this.graphTypes.push({ id: t, label: this.translatorService.t(t) })
+        i++
+      })
+    })
   }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe((data) => {
       const ngs: GraphStruct = {
         dataset: data.dataset,
-        serie: []
+        series: []
       }
 
       this.datasetService.getdata(ngs.dataset!.id).subscribe((d) => {
         ngs.dataset!.data = d
 
-        // Add first default serie
         // TODO improve getfirst [0]
         const fieldsString = this.datasetService.getDataFieldsString(ngs.dataset.data[0])
         const fieldsNumber = this.datasetService.getDataFieldsNumber(ngs.dataset.data[0])
-        console.log(fieldsString, fieldsNumber)
-        ngs.serie.push({
+        // Save discovered fields on dataset level
+        ngs.fields = Object.keys(ngs.dataset.data[0].fields).map(m => ({ id: m, label: this.translatorService.t(m) }))
+        // Add default serie(s)
+        ngs.series.push({
           label: 'Série #1', // TODO #?
+          graphCompatibility: this.graphService.getCompatibilityFromType(GraphType.Bar),
           graphType: GraphType.Bar,
           groupByAttribute: fieldsString[0],
           valueAttribute: fieldsNumber[0],
+          operation: Operation.Sum,
           backgroundColor: this.colors[0],
-          data: this.computeSerieBar(ngs.dataset.data, fieldsString[0], fieldsNumber[0]) // TODO Check and secure
+          data: []
         }, {
           label: 'Série #2',
           graphType: GraphType.Pie,
+          graphCompatibility: this.graphService.getCompatibilityFromType(GraphType.Pie),
           valueAttribute: fieldsNumber[fieldsNumber.length - 1],
+          operation: Operation.Count,
           backgroundColor: this.colors,
-          data: this.computeSeriePie(ngs.dataset.data, fieldsNumber[fieldsNumber.length - 1]) // TODO
+          data: []
         })
+        // Add dataset to graph structure
         this.gs.push(ngs)
 
         // First rendering
@@ -116,34 +135,13 @@ export class DatasetComponent implements OnInit {
     console.log('tabChange: ' + tabName)
   }
 
-  computeSerieBar(data: Data[], groupByAttribute: string, valueAttribute: string, operation = 'sum'): DataStruct[] {
-    const result: DataStruct[] = []
-    data.forEach(d => {
-      const key: string = d.fields[groupByAttribute]
-      const itemIdx = result.findIndex(f => f.label == key)
-      if (itemIdx === -1) {
-        result.push({ label: d.fields[groupByAttribute], value: d.fields[valueAttribute] })
-      } else {
-        // TODO depend on operation
-        result[itemIdx].value += d.fields[valueAttribute]
-      }
-    })
-    return result
-  }
-
-  computeSeriePie(data: Data[], valueAttribute: string, operation = 'count'): DataStruct[] {
-    const result: DataStruct[] = []
-    data.forEach(d => {
-      const key: string = d.fields[valueAttribute]
-      const itemIdx = result.findIndex(f => f.label == key)
-      if (itemIdx === -1) {
-        result.push({ label: key, value: 1 })
-      } else {
-        // TODO depend on operation
-        result[itemIdx].value++
-      }
-    })
-    return result
+  serieOptionChange(event: any, serie: any, attr: string): void {
+    // Update the attribute value
+    serie[attr] = event.value
+    // Update in case of
+    serie.graphCompatibility = this.graphService.getCompatibilityFromType(serie.graphType),
+    // Do it again
+    this.computeData()
   }
 
   computeData(): void {
@@ -153,19 +151,26 @@ export class DatasetComponent implements OnInit {
       const monoGraph = this.gs[0];
 
       // Explore each serie
-      monoGraph.serie.forEach(s => {
+      monoGraph.series.forEach(s => {
         // Get graph type
-        let type: string = ''
-        Object.keys(this.compatibilityTypes).forEach(k => {
-          if (this.compatibilityTypes[k].includes(s.graphType)) {
-            type = k
-          }
-        })
+        const type = this.graphService.getCompatibilityFromType(s.graphType)
+
+        // Compute data
+        switch (s.graphType) {
+          case GraphType.Bar:
+            s.data = this.datasetService.computeSerieBar(monoGraph.dataset.data!, s.groupByAttribute!, s.valueAttribute, s.operation)
+            break
+          case GraphType.Pie:
+            s.data = this.datasetService.computeSeriePie(monoGraph.dataset.data!, s.valueAttribute, s.operation)
+            break
+          default:
+            console.error(`Graph type '${s.graphType}' not implemented`)
+        }
 
         // Sort
         sortByProperty(s.data, 'value', true)
 
-        const layer = this.layers.find(f => f === type)
+        const layer = this.layers.find(f => f.type === type)
         if (!layer) {
           this.layers.push({
             type,
