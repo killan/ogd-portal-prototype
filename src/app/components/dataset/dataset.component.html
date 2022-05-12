@@ -5,15 +5,33 @@
 
   <div class="col">
     <ul class="tabs list-none m-0">
-      <li (click)="tabChange('analyse')" class="p-4 inline-block cursor-pointer" [ngClass]="{'bg-secondary': curTab == 'analyse'}"><i class="fa-solid fa-chart-column"></i> Analyse</li>
+      <li *ngFor="let tab of tabs" (click)="tabChange(tab.key)" class="p-4 inline-block cursor-pointer" [ngClass]="{'bg-secondary': curTab == tab.key}"><i class="fa-solid {{ tab.icon }}"></i> {{ tab.label }}</li>
     </ul>
+
+    <div class="info p-4 bg-secondary" [ngClass]="{'hidden': curTab != 'info'}">
+      <div class="bg-contrast p-4">
+        info
+      </div>
+    </div>
+
+    <div class="data p-4 bg-secondary" [ngClass]="{'hidden': curTab != 'data'}">
+      <div class="bg-contrast p-4">
+        data
+      </div>
+    </div>
+
+    <div class="map p-4 bg-secondary" [ngClass]="{'hidden': curTab != 'map'}">
+      <div class="bg-contrast p-4">
+        map
+      </div>
+    </div>
 
     <div class="analyse p-4 bg-secondary" [ngClass]="{'hidden': curTab != 'analyse'}">
       <div class="bg-contrast p-4">
         <div class="grid">
           <div class="col-{{ 12 / layers.length }} {{ layer.type }}" *ngFor="let layer of layers">
             <p-chart [type]="layer.type" [data]="layer" [options]="computedOptions[layer.type]"
-              height="calc(100vh - 72px - (4 * 24px) - (50px) - 10px - 46px - 60px)"
+              height="calc(100vh - 72px - (4 * 24px) - 60px - 10px - 46px - 60px)"
               width="100%" [style.width]="'calc((100vw - 400px - (1.2rem * 2)) / ' + layers.length + ')'"></p-chart>
             <!-- force height / calculus ? -->
           </div>

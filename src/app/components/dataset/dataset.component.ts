@@ -27,12 +27,20 @@ export class DatasetComponent implements OnInit {
   graphTypes: any[] = []
 
   serieCounter: number = 1
-  curTab: string = 'data'
+
+  tabs: any[] = [
+    { label: 'Information', key: 'info', icon: 'fa-circle-info' },
+    { label: 'Données', key: 'data', icon: 'fa-table' },
+    { label: 'Carte', key: 'map', icon: 'fa-earth-europe' },
+    { label: 'Analyse', key: 'analyse', icon: 'fa-chart-column' }
+  ]
+  curTab: string = 'info'
 
   // datasets[series[]|filtering]
 
   computedOptions: any = {
     bar: {
+      responsive: false,
       plugins: {
         legend: {
           labels: {
@@ -60,6 +68,7 @@ export class DatasetComponent implements OnInit {
       }
     },
     pie: {
+      responsive: false,
       plugins: {
         legend: {
           labels: {
@@ -116,7 +125,7 @@ export class DatasetComponent implements OnInit {
           operation: Operation.Sum,
           backgroundColor: this.colors[0],
           data: []
-        }/*, {
+        }, {
           label: 'Série #' + this.serieCounter++,
           graphType: GraphType.Pie,
           graphCompatibility: this.graphService.getCompatibilityFromType(GraphType.Pie),
@@ -124,7 +133,7 @@ export class DatasetComponent implements OnInit {
           operation: Operation.Count,
           backgroundColor: this.colors,
           data: []
-        }*/)
+        })
         // Add dataset to graph structure
         this.gs.push(ngs)
 
@@ -148,10 +157,14 @@ export class DatasetComponent implements OnInit {
     // Update in case of
     serie.graphCompatibility = this.graphService.getCompatibilityFromType(serie.graphType)
     // Specific update
+    // Default value needed
     if (attr == 'graphType' && !serie.groupByAttribute) {
       serie.groupByAttribute = gs.fields![0].id
     }
-    // TODO on change graph type : change color mode if possible
+    // Multiple colors needed for pie
+    if (attr == 'graphType' && serie.graphType == GraphType.Pie && !Array.isArray(serie.color)) {
+      serie.backgroundColor = this.colors
+    }
     // Do it again
     this.computeData()
   }
