@@ -1,0 +1,18 @@
+<p-table [columns]="cols" [value]="data" responsiveLayout="scroll" [scrollable]="true"
+  (sortFunction)="dataTableSort($event)" [customSort]="customSort" [dataKey]="dataKey">
+  <ng-template pTemplate="header" let-columns>
+      <tr>
+          <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+              {{ col.header }} <p-sortIcon [field]="col.field"></p-sortIcon>
+          </th>
+      </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr>
+          <td *ngFor="let col of columns">
+            <ng-container *ngIf="!col.components"><div [outerHTML]="col.renderer(rowData, col.field)"></div></ng-container>
+            <ng-container *ngIf="col.components" [cellComponentsHost]="col.components" [rowData]="rowData" [field]="col.field"></ng-container>
+          </td>
+      </tr>
+  </ng-template>
+</p-table>

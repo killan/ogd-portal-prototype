@@ -17,8 +17,16 @@ import { TabViewModule } from 'primeng-lts/tabview';
 import { ChartModule } from 'primeng-lts/chart';
 import { DropdownModule } from 'primeng-lts/dropdown';
 import { ButtonModule } from 'primeng-lts/button';
+import { TableModule } from 'primeng-lts/table';
+import { ListboxModule } from 'primeng-lts/listbox';
+import { CheckboxModule } from 'primeng-lts/checkbox';
+import { DragDropModule } from 'primeng-lts/dragdrop';
 
 import { LoaderService } from './services/loader.service';
+
+import { ListComponent } from './shared/components/cell-components/list/list.component';
+import { SimpleTableComponent } from './shared/components/simple-table/simple-table.component';
+import { CellComponentsHostDirective } from './shared/directives/cell-components-host';
 
 @NgModule({
   declarations: [
@@ -28,7 +36,12 @@ import { LoaderService } from './services/loader.service';
     ToolsComponent,
     InfosComponent,
     DatasetsComponent,
-    DatasetComponent
+    DatasetComponent,
+
+    SimpleTableComponent,
+    ListComponent,
+
+    CellComponentsHostDirective
   ],
   imports: [
     BrowserModule,
@@ -40,7 +53,11 @@ import { LoaderService } from './services/loader.service';
     TabViewModule,
     ChartModule,
     DropdownModule,
-    ButtonModule
+    ButtonModule,
+    TableModule,
+    ListboxModule,
+    CheckboxModule,
+    DragDropModule
   ],
   providers: [
     LoaderService,

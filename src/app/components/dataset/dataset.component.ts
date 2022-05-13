@@ -5,11 +5,13 @@ import { GraphType } from 'src/app/enums/graph';
 import { Operation } from 'src/app/enums/operation';
 
 import { GraphStruct } from 'src/app/interfaces/graph';
+import { ColumnDef } from 'src/app/shared/interfaces/table';
 
 import { DatasetService } from 'src/app/services/dataset.service';
 import { GraphService } from 'src/app/services/graph.service';
 import { sortByProperty } from 'src/app/services/sort';
 import { TranslatorService } from 'src/app/services/translator.service';
+import { SortEvent } from 'primeng-lts/api';
 
 @Component({
   selector: 'app-dataset',
@@ -17,6 +19,15 @@ import { TranslatorService } from 'src/app/services/translator.service';
   styleUrls: ['./dataset.component.scss']
 })
 export class DatasetComponent implements OnInit {
+  tabs: any[] = [
+    { label: 'Information', key: 'info', icon: 'fa-circle-info' },
+    { label: 'Données', key: 'data', icon: 'fa-table' },
+    { label: 'Carte', key: 'map', icon: 'fa-earth-europe' },
+    { label: 'Analyse', key: 'analyse', icon: 'fa-chart-column' }
+  ]
+  curTab: string = 'info'
+
+  // Analyse
   gs: GraphStruct[] = []
 
   colors = ['#e76f51', '#2a9d8f', '#457b9d', '#ffafcc', '#cdb4db', '#fca311', '#3a86ff']
@@ -27,16 +38,6 @@ export class DatasetComponent implements OnInit {
   graphTypes: any[] = []
 
   serieCounter: number = 1
-
-  tabs: any[] = [
-    { label: 'Information', key: 'info', icon: 'fa-circle-info' },
-    { label: 'Données', key: 'data', icon: 'fa-table' },
-    { label: 'Carte', key: 'map', icon: 'fa-earth-europe' },
-    { label: 'Analyse', key: 'analyse', icon: 'fa-chart-column' }
-  ]
-  curTab: string = 'info'
-
-  // datasets[series[]|filtering]
 
   computedOptions: any = {
     bar: {
@@ -79,6 +80,16 @@ export class DatasetComponent implements OnInit {
     }
   }
 
+  // Table
+  cols: ColumnDef[] = []
+  activeCols: ColumnDef[] = []
+  selectedCols: string[] = []
+  dragDropColStartIndex!: number
+  dragDropColStartElem!: HTMLElement
+
+  // Cell format
+  dateRE = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}/gm
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private datasetService: DatasetService,
@@ -115,6 +126,24 @@ export class DatasetComponent implements OnInit {
         const fieldsNumber = this.datasetService.getDataFieldsNumber(ngs.dataset.data[0])
         // Save discovered fields on dataset level
         ngs.fields = Object.keys(ngs.dataset.data[0].fields).map(m => ({ id: m, label: this.translatorService.t(m) }))
+
+        // Copy list for table columns option for display
+        this.cols = ngs.fields.map(m => ({
+          field: m.id,
+          header: m.label,
+          renderer: (rowData: any, field: string) => {
+            let d = rowData.fields[field]
+            if (this.dateRE.test(d)) {
+              const td = d.split('T')[0].split('-')
+              const tt = d.split('T')[1].split('+')
+              d = td[2] + '/' + td[1] + '/' + td[0] + ' ' + tt[0].substr(0, 5) + ' (GMT +' + parseInt(tt[1]) + ')'
+            }
+            return d
+          }
+        }))
+        this.selectedCols = this.cols.map(m => m.field)
+        this.selectedColsChange()
+
         // Add default serie(s)
         ngs.series.push({
           label: 'Série #' + this.serieCounter++,
@@ -241,5 +270,55 @@ export class DatasetComponent implements OnInit {
         }
       })
     }
+  }
+
+  dataTableSort(event: SortEvent): void {
+    event.data?.sort((data1, data2) => {
+      let value1 = data1.fields[event.field!];
+      let value2 = data2.fields[event.field!];
+      let result = null;
+
+      if (value1 == null && value2 != null) {
+        result = -1;
+      } else if (value1 != null && value2 == null) {
+        result = 1;
+      } else if (value1 == null && value2 == null) {
+        result = 0;
+      } else if (typeof value1 === 'string' && typeof value2 === 'string') {
+        result = value1.localeCompare(value2);
+      } else {
+        result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
+      }
+
+      return (event.order! * result);
+    });
+  }
+
+  selectedColsChange(): void {
+    this.activeCols = this.cols.filter(f => this.selectedCols.includes(f.field))
+  }
+
+  // https://stackoverflow.com/a/64371813/6427809
+  onColDragStart(index: number, li: HTMLElement): void {
+    this.dragDropColStartIndex = index;
+    this.dragDropColStartElem = li
+    li.style.opacity = '.25'
+  }
+
+  onColDrop(index: number, li: HTMLElement): void {
+    this.dragDropColStartElem.style.opacity = '1'
+    const col = this.cols[this.dragDropColStartIndex]; // get element
+    this.cols.splice(this.dragDropColStartIndex, 1);   // delete from old position
+    this.cols.splice(index, 0, col);                   // add to new position
+    this.selectedColsChange()
+    this.onColDragLeave(index, li)
+  }
+
+  onColDragOver(index: number, li: HTMLElement): void {
+    li.classList.add('hover')
+  }
+
+  onColDragLeave(index: number, li: HTMLElement): void {
+    li.classList.remove('hover')
   }
 }

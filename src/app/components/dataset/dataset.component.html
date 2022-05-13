@@ -15,8 +15,9 @@
     </div>
 
     <div class="data p-4 bg-secondary" [ngClass]="{'hidden': curTab != 'data'}">
-      <div class="bg-contrast p-4">
-        data
+      <div class="bg-contrast p-4" *ngIf="gs && gs[0] && gs[0].dataset?.data">
+        <simple-table [data]="gs[0].dataset.data!" [cols]="activeCols" dataKey="datasetid"
+          (sortFunction)="dataTableSort($event)" [customSort]="true"></simple-table>
       </div>
     </div>
 
@@ -97,6 +98,27 @@
 
         </div>
       </section>-->
+
+      <section class="bloc" [ngClass]="{'hidden': curTab != 'data'}">
+        <h2 class="bloc-title">
+          <span>Options</span>
+          <i class="fa-solid fa-chevron-up"></i>
+        </h2>
+        <div>
+          <h6>Colonnes</h6>
+          <ul class="list-none orderable">
+            <li #li *ngFor="let col of cols; let i = index" class="py-2" pDraggable="col" pDroppable="col"
+              dragHandle=".colDrag" (onDragStart)="onColDragStart(i, li)" (onDrop)="onColDrop(i, li)"
+              (dragover)="onColDragOver(i, li)" (dragleave)="onColDragLeave(i, li)">
+              <label class="flex align-items-center cursor-pointer">
+                <p-checkbox name="selectedCols" [value]="col.field" [(ngModel)]="selectedCols" (onChange)="selectedColsChange()"></p-checkbox>
+                <span class="flex-grow-1 mx-4">{{ col.header }}</span>
+                <i class="fa-solid fa-arrows-up-down colDrag"></i>
+              </label>
+            </li>
+          </ul>
+        </div>
+      </section>
     </ng-container>
   </div>
 </div>

@@ -286,3 +286,12 @@ label {
 .p-field:not(:last-child) {
   margin-bottom: .6rem;
 }
+
+/* Table */
+.data .p-datatable-wrapper {
+  height: calc(calc(100vh - 72px - (4 * 24px) - 60px - 10px - 46px - 60px));
+}
+
+ul.orderable li.hover {
+  border-bottom: 3px solid $color-primary;
+}

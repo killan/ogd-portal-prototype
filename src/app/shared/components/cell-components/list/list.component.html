@@ -1,0 +1,9 @@
+<p-dropdown [options]="items" [(ngModel)]="value" [optionLabel]="itemLabel" [optionValue]="itemValue"
+            [showClear]="true" (onChange)="change($event)" class="full-width">
+  <ng-template let-item pTemplate="selectedItem">
+    {{ item[itemLabel] }}
+  </ng-template>
+  <ng-template let-item pTemplate="item">
+    {{ item[itemLabel] }}
+  </ng-template>
+</p-dropdown>
