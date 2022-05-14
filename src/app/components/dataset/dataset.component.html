@@ -1,12 +1,27 @@
 <h1>{{ gs.length > 0 ? gs[0].dataset?.name : 'Chargement en cours' }}</h1>
 
+<!-- Help -->
+<p-overlayPanel #hfilter>
+  <ng-template pTemplate>
+      <p>Ajoutez un filtre en sélectionnant un attribut, puis entrez une valeur et un mode de comparaison.</p>
+      <p>La mise à jour se fait en sortant du champs.</p>
+  </ng-template>
+</p-overlayPanel>
+
+<p-overlayPanel #htableOptions>
+  <ng-template pTemplate>
+      <p>Cochez/décochez les cases pour afficher/masquer une colonne.</p>
+      <p>Utilisez <i class="fa-solid fa-arrows-up-down"></i> pour réordonner par glissé/déplacé une colonne dans la liste.</p>
+  </ng-template>
+</p-overlayPanel>
+
 <div class="grid">
   <div class="col-fixed" style="width:200px">
     <ng-container *ngIf="gs && gs.length">
       <section class="bloc multi" [ngClass]="{'hidden': curTab != 'data' && curTab != 'analyse'}">
         <h2 class="bloc-title">
           <span>Filtres</span>
-          <i class="fa-solid fa-circle-info"></i>
+          <i class="fa-solid fa-circle-info cursor-pointer" (click)="hfilter.toggle($event)"></i>
           <i class="fa-solid fa-chevron-up"></i>
         </h2>
 
@@ -144,6 +159,7 @@
       <section class="bloc" [ngClass]="{'hidden': curTab != 'data'}">
         <h2 class="bloc-title">
           <span>Options</span>
+          <i class="fa-solid fa-circle-info cursor-pointer" (click)="htableOptions.toggle($event)"></i>
           <i class="fa-solid fa-chevron-up"></i>
         </h2>
         <div>

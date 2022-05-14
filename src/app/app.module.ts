@@ -22,6 +22,7 @@ import { ListboxModule } from 'primeng-lts/listbox';
 import { CheckboxModule } from 'primeng-lts/checkbox';
 import { DragDropModule } from 'primeng-lts/dragdrop';
 import { InputTextModule } from 'primeng-lts/inputtext';
+import { OverlayPanelModule } from 'primeng-lts/overlaypanel';
 
 import { LoaderService } from './services/loader.service';
 
@@ -59,7 +60,8 @@ import { CellComponentsHostDirective } from './shared/directives/cell-components
     ListboxModule,
     CheckboxModule,
     DragDropModule,
-    InputTextModule
+    InputTextModule,
+    OverlayPanelModule
   ],
   providers: [
     LoaderService,
