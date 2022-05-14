@@ -91,7 +91,6 @@
             <p-chart [type]="layer.type" [data]="layer" [options]="computedOptions[layer.type]"
               height="calc(100vh - 72px - (4 * 24px) - 60px - 10px - 46px - 60px)"
               width="100%" [style.width]="'calc((100vw - 400px - (1.2rem * 2)) / ' + layers.length + ')'"></p-chart>
-            <!-- force height / calculus ? -->
           </div>
         </div>
       </div>
@@ -142,7 +141,7 @@
           </div>
         </div>
 
-        <button pButton label="Ajouter une série" icon="fa-solid fa-plus" class="p-button-secondary w-12"
+        <button pButton label="Ajouter une série" icon="fa-solid fa-plus" class="w-12"
           (click)="addSerie($event, gs[0])"></button>
       </section>
 
