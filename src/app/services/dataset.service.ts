@@ -55,26 +55,26 @@ export class DatasetService {
     return fields
   }
 
-  computeSerieBar(data: Data[], groupByAttribute: string, valueAttribute: string, operation = Operation.Sum): DataStruct[] {
+  computeSerieBar(data: any[], groupByAttribute: string, valueAttribute: string, operation = Operation.Sum): DataStruct[] {
     return this.computeSerie(data, valueAttribute, operation, groupByAttribute)
   }
 
-  computeSeriePie(data: Data[], valueAttribute: string, operation = Operation.Count): DataStruct[] {
+  computeSeriePie(data: any[], valueAttribute: string, operation = Operation.Count): DataStruct[] {
     return this.computeSerie(data, valueAttribute, operation)
   }
 
-  computeSerie(data: Data[], valueAttribute: string, operation = Operation.Count, groupByAttribute?: string): DataStruct[] {
+  computeSerie(data: any[], valueAttribute: string, operation = Operation.Count, groupByAttribute?: string): DataStruct[] {
     const result: DataStruct[] = []
     data.forEach(d => {
-      const key: string = d.fields[groupByAttribute ? groupByAttribute : valueAttribute]
+      const key: string = d[groupByAttribute ? groupByAttribute : valueAttribute]
       const itemIdx = result.findIndex(f => f.label == key)
       if (itemIdx === -1) {
         result.push({
-          label: groupByAttribute ? d.fields[groupByAttribute] : key,
-          value: this.startOperation(d.fields[valueAttribute], operation)
+          label: groupByAttribute ? d[groupByAttribute] : key,
+          value: this.startOperation(d[valueAttribute], operation)
         })
       } else {
-        result[itemIdx].value = this.applyOperation(result[itemIdx].value, d.fields[valueAttribute], operation)
+        result[itemIdx].value = this.applyOperation(result[itemIdx].value, d[valueAttribute], operation)
       }
     })
     return result

@@ -1,7 +1,50 @@
 <h1>{{ gs.length > 0 ? gs[0].dataset?.name : 'Chargement en cours' }}</h1>
 
 <div class="grid">
-  <div class="col-fixed" style="width:200px">Fixed</div>
+  <div class="col-fixed" style="width:200px">
+    <ng-container *ngIf="gs && gs.length">
+      <section class="bloc multi" [ngClass]="{'hidden': curTab != 'data' && curTab != 'analyse'}">
+        <h2 class="bloc-title">
+          <span>Filtres</span>
+          <i class="fa-solid fa-circle-info"></i>
+          <i class="fa-solid fa-chevron-up"></i>
+        </h2>
+
+        <div class="bloc-item" *ngFor="let filter of filters; let i = index">
+          <div class="closer text-alert cursor-pointer" (click)="removeFilter($event, filter, i)"><i class="fa-solid fa-circle-xmark"></i></div>
+          <h3 class="bloc-title">
+            <span>{{ filter.label }}</span>
+          </h3>
+          <div class="options">
+            <div class="p-field">
+              <label [for]="'val_' + i">Valeur</label>
+              <input type="text" pInputText [(ngModel)]="filter.value" class="w-12" [id]="'val_' + i"
+                (blur)="filterOptionChange($event, filter, 'val')"/>
+            </div>
+            <div class="p-field">
+              <label [for]="'mode_' + i">Mode de filtrage</label>
+              <p-dropdown [options]="modes" [ngModel]="filter.mode" optionValue="id" optionLabel="label"
+                styleClass="w-12" [inputId]="'mode_' + i" (onChange)="filterOptionChange($event, filter, 'mode')">
+              </p-dropdown>
+            </div>
+          </div>
+        </div>
+
+        <div class="bloc-item">
+          <h3 class="bloc-title">
+            <span>Ajouter un filtre</span>
+          </h3>
+          <div class="p-field">
+            <label for="addFilter">Attribut</label>
+            <p-dropdown [options]="gs[0].fields!" #ddField optionValue="id" inputId="addFilter"
+              optionLabel="label" styleClass="w-12"></p-dropdown>
+          </div>
+          <button pButton label="Ajouter" icon="fa-solid fa-plus" class="p-button-primary w-12"
+            (click)="addFilter($event, ddField)"></button>
+        </div>
+      </section>
+    </ng-container>
+  </div>
 
   <div class="col">
     <ul class="tabs list-none m-0">
@@ -16,8 +59,7 @@
 
     <div class="data p-4 bg-secondary" [ngClass]="{'hidden': curTab != 'data'}">
       <div class="bg-contrast p-4" *ngIf="gs && gs[0] && gs[0].dataset?.data">
-        <simple-table [data]="gs[0].dataset.data!" [cols]="activeCols" dataKey="datasetid"
-          (sortFunction)="dataTableSort($event)" [customSort]="true"></simple-table>
+        <simple-table [data]="data" [cols]="activeCols" dataKey="datasetid"></simple-table>
       </div>
     </div>
 

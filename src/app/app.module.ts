@@ -21,6 +21,7 @@ import { TableModule } from 'primeng-lts/table';
 import { ListboxModule } from 'primeng-lts/listbox';
 import { CheckboxModule } from 'primeng-lts/checkbox';
 import { DragDropModule } from 'primeng-lts/dragdrop';
+import { InputTextModule } from 'primeng-lts/inputtext';
 
 import { LoaderService } from './services/loader.service';
 
@@ -57,7 +58,8 @@ import { CellComponentsHostDirective } from './shared/directives/cell-components
     TableModule,
     ListboxModule,
     CheckboxModule,
-    DragDropModule
+    DragDropModule,
+    InputTextModule
   ],
   providers: [
     LoaderService,

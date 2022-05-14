@@ -3,15 +3,18 @@ import { ActivatedRoute } from '@angular/router';
 
 import { GraphType } from 'src/app/enums/graph';
 import { Operation } from 'src/app/enums/operation';
+import { FilterMode } from 'src/app/enums/filter';
 
 import { GraphStruct } from 'src/app/interfaces/graph';
 import { ColumnDef } from 'src/app/shared/interfaces/table';
+import { Filter } from 'src/app/interfaces/filter';
 
 import { DatasetService } from 'src/app/services/dataset.service';
 import { GraphService } from 'src/app/services/graph.service';
 import { sortByProperty } from 'src/app/services/sort';
 import { TranslatorService } from 'src/app/services/translator.service';
-import { SortEvent } from 'primeng-lts/api';
+
+import { Dropdown } from 'primeng-lts/dropdown';
 
 @Component({
   selector: 'app-dataset',
@@ -26,6 +29,10 @@ export class DatasetComponent implements OnInit {
     { label: 'Analyse', key: 'analyse', icon: 'fa-chart-column' }
   ]
   curTab: string = 'info'
+
+  // Filters
+  filters: Filter[] = []
+  modes: any[] = []
 
   // Analyse
   gs: GraphStruct[] = []
@@ -90,6 +97,9 @@ export class DatasetComponent implements OnInit {
   // Cell format
   dateRE = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}/gm
 
+  // Data
+  data: any[] = []
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private datasetService: DatasetService,
@@ -97,8 +107,13 @@ export class DatasetComponent implements OnInit {
     private translatorService: TranslatorService
   ) {
     this.operations = [
-      { id: 'sum', label: this.translatorService.t('sum') },
-      { id: 'cnt', label: this.translatorService.t('cnt') }
+      { id: Operation.Sum, label: this.translatorService.t(Operation.Sum) },
+      { id: Operation.Count, label: this.translatorService.t(Operation.Count) }
+    ]
+
+    this.modes = [
+      { id: FilterMode.Contains, label: this.translatorService.t(FilterMode.Contains) },
+      { id: FilterMode.Equal, label: this.translatorService.t(FilterMode.Equal) },
     ]
 
     let i = 1;
@@ -132,7 +147,7 @@ export class DatasetComponent implements OnInit {
           field: m.id,
           header: m.label,
           renderer: (rowData: any, field: string) => {
-            let d = rowData.fields[field]
+            let d = rowData[field]
             if (this.dateRE.test(d)) {
               const td = d.split('T')[0].split('-')
               const tt = d.split('T')[1].split('+')
@@ -228,6 +243,24 @@ export class DatasetComponent implements OnInit {
     if (this.gs && this.gs.length) {
       const monoGraph = this.gs[0];
 
+      // Prepare data, one dataset
+      this.data = monoGraph.dataset.data!.filter(d => {
+        let pass = true
+
+        this.filters.forEach(f => {
+          switch (f.mode) {
+            case FilterMode.Contains:
+              pass = (d.fields[f.attr] as string).toLowerCase().includes(f.value.toLowerCase())
+              break
+            case FilterMode.Equal:
+              pass = d.fields[f.attr] == f.value
+              break
+          }
+        })
+
+        return pass
+      }).map(m => m.fields)
+
       // Explore each serie
       monoGraph.series.forEach(s => {
         // Get graph type
@@ -236,10 +269,10 @@ export class DatasetComponent implements OnInit {
         // Compute data
         switch (s.graphType) {
           case GraphType.Bar:
-            s.data = this.datasetService.computeSerieBar(monoGraph.dataset.data!, s.groupByAttribute!, s.valueAttribute, s.operation)
+            s.data = this.datasetService.computeSerieBar(this.data, s.groupByAttribute!, s.valueAttribute, s.operation)
             break
           case GraphType.Pie:
-            s.data = this.datasetService.computeSeriePie(monoGraph.dataset.data!, s.valueAttribute, s.operation)
+            s.data = this.datasetService.computeSeriePie(this.data, s.valueAttribute, s.operation)
             break
           default:
             console.error(`Graph type '${s.graphType}' not implemented`)
@@ -272,28 +305,6 @@ export class DatasetComponent implements OnInit {
     }
   }
 
-  dataTableSort(event: SortEvent): void {
-    event.data?.sort((data1, data2) => {
-      let value1 = data1.fields[event.field!];
-      let value2 = data2.fields[event.field!];
-      let result = null;
-
-      if (value1 == null && value2 != null) {
-        result = -1;
-      } else if (value1 != null && value2 == null) {
-        result = 1;
-      } else if (value1 == null && value2 == null) {
-        result = 0;
-      } else if (typeof value1 === 'string' && typeof value2 === 'string') {
-        result = value1.localeCompare(value2);
-      } else {
-        result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
-      }
-
-      return (event.order! * result);
-    });
-  }
-
   selectedColsChange(): void {
     this.activeCols = this.cols.filter(f => this.selectedCols.includes(f.field))
   }
@@ -320,5 +331,24 @@ export class DatasetComponent implements OnInit {
 
   onColDragLeave(index: number, li: HTMLElement): void {
     li.classList.remove('hover')
+  }
+
+  // Filters
+  addFilter(event: any, ddField: Dropdown): void {
+    this.filters.push({ label: this.translatorService.t(ddField.value), attr: ddField.value, value: '', mode: FilterMode.Contains })
+  }
+
+  removeFilter(event: any, filter: any, index: number): void {
+    // Remove
+    this.filters.splice(index, 1)
+    // Do it again
+    this.computeData()
+  }
+
+  filterOptionChange(event: any, filter: any, attr: string): void {
+    // Update the attribute value
+    filter[attr] = event.value
+    // Do it again
+    this.computeData()
   }
 }

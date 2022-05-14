@@ -20,6 +20,11 @@ export class TranslatorService {
     prode_pot: 'Production électrique potentielle moyenne par m² de toiture',
     quart_code: 'Code',
     quart_an_contruct_moy: 'Année de construction moyene',
+
+    '%': 'Contient',
+    '=': 'Égal',
+    '>=': 'Plus grand ou égal',
+    '<=': 'Plus petit ou égal'
   }
 
   t(key: string): string {

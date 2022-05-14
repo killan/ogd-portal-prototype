@@ -1,5 +1,6 @@
 <p-table [columns]="cols" [value]="data" responsiveLayout="scroll" [scrollable]="true"
-  (sortFunction)="dataTableSort($event)" [customSort]="customSort" [dataKey]="dataKey">
+  (sortFunction)="dataTableSort($event)" [customSort]="customSort" [dataKey]="dataKey"
+  styleClass="p-datatable-striped" sortMode="multiple">
   <ng-template pTemplate="header" let-columns>
       <tr>
           <th *ngFor="let col of columns" [pSortableColumn]="col.field">
