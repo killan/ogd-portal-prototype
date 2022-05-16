@@ -49,9 +49,15 @@
               "src/favicon.ico",
               "src/assets",
               "src/favicon-32x32.png",
-              "src/site.webmanifest"
+              "src/site.webmanifest",
+              {
+                "glob": "**/*",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "leaflet/"
+              }
             ],
             "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
               "src/styles.scss"
             ],
             "scripts": [

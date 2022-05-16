@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GraphType } from 'src/app/enums/graph';
 import { Operation } from 'src/app/enums/operation';
 import { FilterMode } from 'src/app/enums/filter';
+import { GeoFieldType } from 'src/app/enums/map';
 
 import { GraphStruct } from 'src/app/interfaces/graph';
 import { ColumnDef } from 'src/app/shared/interfaces/table';
@@ -13,8 +14,11 @@ import { DatasetService } from 'src/app/services/dataset.service';
 import { GraphService } from 'src/app/services/graph.service';
 import { sortByProperty } from 'src/app/services/sort';
 import { TranslatorService } from 'src/app/services/translator.service';
+import { ColorService } from 'src/app/services/color.service';
 
 import { Dropdown } from 'primeng-lts/dropdown';
+
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-dataset',
@@ -100,11 +104,20 @@ export class DatasetComponent implements OnInit {
   // Data
   data: any[] = []
 
+  // Map
+  map!: L.Map
+  mapGeoAttr: any
+  mapAttr: any
+  mapGeoAttrs: any[] = []
+  layerGroup!: L.LayerGroup
+  mapLegend: any[] = []
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private datasetService: DatasetService,
     private graphService: GraphService,
-    private translatorService: TranslatorService
+    private translatorService: TranslatorService,
+    private colorService: ColorService
   ) {
     this.operations = [
       { id: Operation.Sum, label: this.translatorService.t(Operation.Sum) },
@@ -159,6 +172,10 @@ export class DatasetComponent implements OnInit {
         this.selectedCols = this.cols.map(m => m.field)
         this.selectedColsChange()
 
+        this.mapGeoAttrs = this.datasetService.getDataFieldsGeo(ngs.dataset.data[0]).map(m => ({ id: m.key, label: this.translatorService.t(m.key) + ` (${m.type})`, type: m.type }))
+        this.mapAttr = ngs.fields[0].id
+        this.mapGeoAttr = this.mapGeoAttrs[0].id
+
         // Add default serie(s)
         ngs.series.push({
           label: 'Série #' + this.serieCounter++,
@@ -193,6 +210,12 @@ export class DatasetComponent implements OnInit {
 
   tabChange(tabName: string): void {
     this.curTab = tabName
+
+    if (this.curTab == 'map') {
+      setTimeout(() => {
+        this.map.invalidateSize();
+      }, 0);
+    }
   }
 
   serieOptionChange(event: any, gs: GraphStruct, serie: any, attr: string): void {
@@ -303,6 +326,9 @@ export class DatasetComponent implements OnInit {
         }
       })
     }
+
+    // Map
+    this.initMap()
   }
 
   selectedColsChange(): void {
@@ -343,6 +369,7 @@ export class DatasetComponent implements OnInit {
     this.filters.splice(index, 1)
     // Do it again
     this.computeData()
+    this.mapOptionChange({}, '')
   }
 
   filterOptionChange(event: any, filter: any, attr: string): void {
@@ -350,5 +377,94 @@ export class DatasetComponent implements OnInit {
     filter[attr] = event.value
     // Do it again
     this.computeData()
+    this.mapOptionChange({}, '')
+  }
+
+  // Map
+  private initMap(): void {
+    if(!this.map) {
+      this.map = L.map('map', {
+        center: [50.46582774066918, 4.857705342916636],
+        zoom: 12
+      })
+
+      const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        minZoom: 3,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      })
+
+      this.layerGroup = L.layerGroup().addTo(this.map);
+      this.mapOptionChange({}, '')
+
+      tiles.addTo(this.map)
+    }
+  }
+
+  onMapReady(event: any): void {
+    this.map = event as L.Map
+  }
+
+  onResized() {
+    if (this.map) {
+      this.map.invalidateSize();
+    }
+  }
+
+  mapOptionChange(event: any, attr: string): void {
+    this.layerGroup.clearLayers()
+    this.mapLegend = []
+
+    const steps = 3
+    const rangeColors = this.colorService.interpolateColors('255, 186, 8', '208, 0, 0', steps)
+
+    if (this.gs && this.gs.length) {
+      const monoGraph = this.gs[0];
+      const type = this.mapGeoAttrs.find(f => f.id === this.mapGeoAttr).type
+
+      // TODO Check mode ?
+      // Search values
+      let min: number = this.data[0][this.mapAttr]
+      let max: number = this.data[0][this.mapAttr]
+      this.data.forEach(d => {
+        min = Math.min(min, d[this.mapAttr])
+        max = Math.max(max, d[this.mapAttr])
+      })
+
+      // Apply color
+      const stepDistance: number = (max - min) / (steps - 1)
+      this.data.forEach(d => {
+        d.mapColor = Math.round((d[this.mapAttr] - min) / stepDistance)
+      })
+
+      for (let i = min, ic = 0; i <= max; i += stepDistance, ic++) {
+        this.mapLegend.push({ value: Math.round(i) + ' -> ' + Math.round(i + stepDistance), color: rangeColors[ic] })
+      }
+
+      this.data.forEach(d => {
+        switch (type) {
+          case GeoFieldType.Point:
+            L.marker(d[this.mapGeoAttr], {
+              icon: L.icon({
+                iconSize: [ 25, 41 ],
+                iconAnchor: [ 13, 41 ],
+                iconUrl: '/leaflet/marker-icon.png',
+                shadowUrl: '/leaflet/marker-shadow.png'
+              })
+            })
+              .addTo(this.layerGroup);
+            break;
+          case GeoFieldType.Polygon:
+            d[this.mapGeoAttr].coordinates.forEach((c: any) => {
+              L.polygon(c.map((m: any) => [m[1], m[0]]), {
+                color: `rgb(${rangeColors[d.mapColor][0]}, ${rangeColors[d.mapColor][1]}, ${rangeColors[d.mapColor][2]})`,
+                fillColor: `rgb(${rangeColors[d.mapColor][0]}, ${rangeColors[d.mapColor][1]}, ${rangeColors[d.mapColor][2]})`,
+                fillOpacity: .4
+              }).addTo(this.layerGroup)
+            })
+            break;
+        }
+      })
+    }
   }
 }

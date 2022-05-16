@@ -323,3 +323,22 @@ label {
 ul.orderable li.hover {
   border-bottom: 3px solid $color-primary;
 }
+
+/* Map */
+#map {
+  height: calc(calc(100vh - 72px - (4 * 24px) - 60px - 10px - 46px - 30px));
+  width: 100%
+}
+
+.legend {
+  li {
+    display: flex;
+
+    .color {
+      width: 1.2rem;
+      flex-grow: 0;
+      height: 1.2rem;
+      margin-right: .8rem;
+    }
+  }
+}

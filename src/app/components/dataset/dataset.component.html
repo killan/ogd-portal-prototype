@@ -18,7 +18,7 @@
 <div class="grid">
   <div class="col-fixed" style="width:200px">
     <ng-container *ngIf="gs && gs.length">
-      <section class="bloc multi" [ngClass]="{'hidden': curTab != 'data' && curTab != 'analyse'}">
+      <section class="bloc multi" [ngClass]="{'hidden': !['data', 'analyse', 'map'].includes(curTab)}">
         <h2 class="bloc-title">
           <span>Filtres</span>
           <i class="fa-solid fa-circle-info cursor-pointer" (click)="hfilter.toggle($event)"></i>
@@ -79,8 +79,9 @@
     </div>
 
     <div class="map p-4 bg-secondary" [ngClass]="{'hidden': curTab != 'map'}">
-      <div class="bg-contrast p-4">
-        map
+      <div id="map" leaflet
+        (leafletMapReady)="onMapReady($event)"
+        (resized)="onResized()">
       </div>
     </div>
 
@@ -145,16 +146,6 @@
           (click)="addSerie($event, gs[0])"></button>
       </section>
 
-      <!--<section class="bloc">
-        <h2 class="bloc-title">
-          <span>Options</span>
-          <i class="fa-solid fa-chevron-up"></i>
-        </h2>
-        <div class="options">
-
-        </div>
-      </section>-->
-
       <section class="bloc" [ngClass]="{'hidden': curTab != 'data'}">
         <h2 class="bloc-title">
           <span>Options</span>
@@ -172,6 +163,41 @@
                 <span class="flex-grow-1 mx-4">{{ col.header }}</span>
                 <i class="fa-solid fa-arrows-up-down colDrag"></i>
               </label>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="bloc" [ngClass]="{'hidden': curTab != 'map'}">
+        <h2 class="bloc-title">
+          <span>Options</span>
+          <i class="fa-solid fa-chevron-up"></i>
+        </h2>
+        <div>
+          <div class="p-field">
+            <label for="mapgeoattr">Attribut géographique</label>
+            <p-dropdown [options]="mapGeoAttrs" [(ngModel)]="mapGeoAttr" optionValue="id" optionLabel="label"
+              styleClass="w-12" inputId="mapgeoattr" (onChange)="mapOptionChange($event, 'mapGeoAttr')">
+            </p-dropdown>
+          </div>
+          <div class="p-field">
+            <label for="mapattr">Attribut à afficher</label>
+            <p-dropdown [options]="gs[0].fields!" [(ngModel)]="mapAttr" optionValue="id" optionLabel="label"
+              styleClass="w-12" inputId="mapattr" (onChange)="mapOptionChange($event, 'mapAttr')"></p-dropdown>
+          </div>
+        </div>
+      </section>
+
+      <section class="bloc mt-4" [ngClass]="{'hidden': curTab != 'map'}" *ngIf="mapLegend && mapLegend.length">
+        <h2 class="bloc-title">
+          <span>Légende</span>
+          <i class="fa-solid fa-chevron-up"></i>
+        </h2>
+        <div>
+          <ul class="legend">
+            <li *ngFor="let l of mapLegend">
+              <span class="color" [style.background-color]="'rgb('+l.color[0]+', '+l.color[1]+', '+l.color[2]+')'"></span>
+              <span class="label">{{ l.value }}</span>
             </li>
           </ul>
         </div>

@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { GeoFieldType } from '../enums/map';
 import { Operation } from '../enums/operation';
 
 import { Data, Dataset } from '../interfaces/dataset';
 import { DataStruct } from '../interfaces/graph';
+import { GeoField } from '../interfaces/map';
 
 @Injectable({
   providedIn: 'root'
@@ -50,6 +52,20 @@ export class DatasetService {
     Object.keys(data.fields).forEach(k => {
       if (typeof data.fields[k] == 'number') {
         fields.push(k)
+      }
+    })
+    return fields
+  }
+
+  getDataFieldsGeo(data: Data): GeoField[] {
+    const fields: GeoField[] = []
+    Object.keys(data.fields).forEach(k => {
+      let type: GeoFieldType
+      if (Array.isArray(data.fields[k]) && data.fields[k].length == 2 && typeof data.fields[k][0] == 'number') {
+        fields.push({ key: k, type: GeoFieldType.Point })
+      } else if (data.fields[k].coordinates) {
+        // TODO need additional type check ?
+        fields.push({ key: k, type: GeoFieldType.Polygon })
       }
     })
     return fields
