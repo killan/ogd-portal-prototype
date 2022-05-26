@@ -27,12 +27,22 @@ import * as L from 'leaflet';
 })
 export class DatasetComponent implements OnInit {
   tabs: any[] = [
-    { label: 'Information', key: 'info', icon: 'fa-circle-info' },
-    { label: 'Données', key: 'data', icon: 'fa-table' },
-    { label: 'Carte', key: 'map', icon: 'fa-earth-europe' },
-    { label: 'Analyse', key: 'analyse', icon: 'fa-chart-column' }
+    { label: 'Information', key: 'info', icon: 'fa-circle-info', disabled: false },
+    { label: 'Données', key: 'data', icon: 'fa-table', disabled: false },
+    { label: 'Carte', key: 'map', icon: 'fa-earth-europe', disabled: true },
+    { label: 'Analyse', key: 'analyse', icon: 'fa-chart-column', disabled: false }
   ]
   curTab: string = 'info'
+
+  _hasMap = false
+  set hasMap(v: boolean) {
+    this._hasMap = v
+
+    this.tabs.find(f => f.key == 'map').disabled = !v
+  }
+  get hasMap(): boolean {
+    return this._hasMap
+  }
 
   // Filters
   filters: Filter[] = []
@@ -174,7 +184,10 @@ export class DatasetComponent implements OnInit {
 
         this.mapGeoAttrs = this.datasetService.getDataFieldsGeo(ngs.dataset.data[0]).map(m => ({ id: m.key, label: this.translatorService.t(m.key) + ` (${m.type})`, type: m.type }))
         this.mapAttr = ngs.fields[0].id
-        this.mapGeoAttr = this.mapGeoAttrs[0].id
+        if (this.mapGeoAttrs.length) {
+          this.hasMap = true
+          this.mapGeoAttr = this.mapGeoAttrs[0].id
+        }
 
         // Add default serie(s)
         ngs.series.push({
@@ -209,7 +222,17 @@ export class DatasetComponent implements OnInit {
   }
 
   tabChange(tabName: string): void {
+    if (this.tabs.find(f => f.key == tabName).disabled) {
+      return
+    }
+
     this.curTab = tabName
+
+    if (this.curTab == 'data') {
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 0)
+    }
 
     if (this.curTab == 'map') {
       setTimeout(() => {
@@ -265,24 +288,28 @@ export class DatasetComponent implements OnInit {
 
     if (this.gs && this.gs.length) {
       const monoGraph = this.gs[0];
+      console.info('Computing data...')
 
       // Prepare data, one dataset
-      this.data = monoGraph.dataset.data!.filter(d => {
-        let pass = true
+      this.data = monoGraph.dataset.data!.map(m => m.fields)
+      if (this.filters.length) {
+        this.data = this.data.filter(d => {
+          let pass = true
 
-        this.filters.forEach(f => {
-          switch (f.mode) {
-            case FilterMode.Contains:
-              pass = (d.fields[f.attr] as string).toLowerCase().includes(f.value.toLowerCase())
-              break
-            case FilterMode.Equal:
-              pass = d.fields[f.attr] == f.value
-              break
-          }
+          this.filters.forEach(f => {
+            switch (f.mode) {
+              case FilterMode.Contains:
+                pass = (d[f.attr] as string).toLowerCase().includes(f.value.toLowerCase())
+                break
+              case FilterMode.Equal:
+                pass = d[f.attr] == f.value
+                break
+            }
+          })
+
+          return pass
         })
-
-        return pass
-      }).map(m => m.fields)
+      }
 
       // Explore each serie
       monoGraph.series.forEach(s => {
@@ -327,8 +354,12 @@ export class DatasetComponent implements OnInit {
       })
     }
 
+    console.info('Computing data: done')
+
     // Map
-    this.initMap()
+    if (this.hasMap) {
+      this.initMap()
+    }
   }
 
   selectedColsChange(): void {
@@ -383,6 +414,7 @@ export class DatasetComponent implements OnInit {
   // Map
   private initMap(): void {
     if(!this.map) {
+      console.info('Map initializing...')
       this.map = L.map('map', {
         center: [50.46582774066918, 4.857705342916636],
         zoom: 12
