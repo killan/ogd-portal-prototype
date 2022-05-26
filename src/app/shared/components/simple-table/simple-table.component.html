@@ -1,6 +1,8 @@
-<p-table [columns]="cols" [value]="data" responsiveLayout="scroll" [scrollable]="true"
-  (sortFunction)="dataTableSort($event)" [customSort]="customSort" [dataKey]="dataKey"
-  styleClass="p-datatable-striped" sortMode="multiple">
+<p-table [columns]="cols" [value]="data" [scrollable]="true" [rows]="100"
+  scrollHeight="calc(100vh - 72px - (4 * 24px) - 60px - 10px - 46px - 60px)"
+  [virtualScroll]="true" [virtualRowHeight]="45"
+  (sortFunction)="dataTableSort($event)" [customSort]="customSort" sortMode="multiple"
+  styleClass="p-datatable-striped" [dataKey]="dataKey">
   <ng-template pTemplate="header" let-columns>
       <tr>
           <th *ngFor="let col of columns" [pSortableColumn]="col.field">
